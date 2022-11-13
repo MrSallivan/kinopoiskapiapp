@@ -50,20 +50,48 @@ const initApp = (page = 1) => {
 	})
 		.then((response) => response.json())
 		.then((data) => {
-			console.log(data)
 			//считаем кол-во страниц и ваводим в пагинацию
-
 			const total = data.total
 			const pages = Math.ceil(total / 10)
-
+			
 			for (let i = pages; i >= 1; i--) {
 				paginationsEl.forEach(el => {
 					el.insertAdjacentHTML('afterbegin', `
 						<li class="app__pagination-item">
-							<a href="?page=${i}" class="app__pagination-link">${i}</a>
+							<a href="?page=${i}" class="app__pagination-link ${i == queryParam ? 'app__pagination-link--current' : ''}">${i}</a>
 						</li>
 					`)
 				})
+			}
+			return data
+		})
+		.then((data)=>{
+			for (const item of data.releases) {
+				console.log(item)
+
+				let genres = item.genres.forEach(item =>{
+					let genres = ''
+					genres += item.genre
+				})
+				
+				appListEl.insertAdjacentHTML('afterbegin', `
+					<li class="app__list-item">
+					<article class="app__card movie-card">
+						<a href="https://www.kinopoisk.ru/film/${item.filmId}" target="_blank" class="movie-card__link">
+							<div class="movie-card__image-wrapper">
+								<img src="${item.posterUrlPreview}" class="movie-card__image" alt="${item.nameRu}" loading="lazy">
+								<div class="movie-card__hover">
+									<div class="movie-card__rating">${item.rating}</div>
+									<div class="movie-card__genres">${genres}</div>
+									<div class="movie-card__duration">${item.duration} минут</div>
+								</div>
+							</div>
+							<h2 class="movie-card__title">${item.nameRu}</h2>
+							<div class="movie-card__date">1 ноября</div>
+						</a>
+					</article>
+				</li>
+				`)
 			}
 		})
 }
