@@ -66,14 +66,26 @@ const initApp = (page = 1) => {
 			return data
 		})
 		.then((data)=>{
+			
 			for (const item of data.releases) {
 				console.log(item)
 
-				let genres = item.genres.forEach(item =>{
-					let genres = ''
-					genres += item.genre
+				let genresAll = ''
+				let genres = item.genres
+				genres.forEach(item =>{
+					genresAll += item.genre + " "
 				})
-				
+
+				const options = {
+					month: 'long',
+					day: 'numeric'
+
+				}
+
+				let date = new Date(item.releaseDate).toLocaleDateString('ru-RU', options)
+
+				let duration = `${item.duration} ${declOfNum(item.duration, ['минута', 'минуты', 'минут'])}`
+
 				appListEl.insertAdjacentHTML('afterbegin', `
 					<li class="app__list-item">
 					<article class="app__card movie-card">
@@ -81,13 +93,13 @@ const initApp = (page = 1) => {
 							<div class="movie-card__image-wrapper">
 								<img src="${item.posterUrlPreview}" class="movie-card__image" alt="${item.nameRu}" loading="lazy">
 								<div class="movie-card__hover">
-									<div class="movie-card__rating">${item.rating}</div>
-									<div class="movie-card__genres">${genres}</div>
-									<div class="movie-card__duration">${item.duration} минут</div>
+									<div class="movie-card__rating ${item.rating == null ? 'movie-card__rating--null' : ''}">${item.rating == null ? 'нет рейтинга' : item.rating}</div>
+									<div class="movie-card__genres">${genresAll}</div>
+									<div class="movie-card__duration ${item.duration == 0 ? 'movie-card__duration--hidden' : ''}">${duration}</div>
 								</div>
 							</div>
 							<h2 class="movie-card__title">${item.nameRu}</h2>
-							<div class="movie-card__date">1 ноября</div>
+							<div class="movie-card__date">${date}</div>
 						</a>
 					</article>
 				</li>
