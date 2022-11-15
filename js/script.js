@@ -35,6 +35,8 @@ const appListEl = document.querySelector('.app__list')
 const yearEl = document.querySelector('.year')
 const monthEl = document.querySelector('.month')
 const paginationsEl = document.querySelectorAll('.app__pagination')
+const errorEl = document.querySelector('.app__error')
+const loadingEl = document.querySelector('.app__loading')
 
 yearEl.textContent = currentYear
 monthEl.textContent = currentMonthText
@@ -50,6 +52,9 @@ const initApp = (page = 1) => {
 	})
 		.then((response) => response.json())
 		.then((data) => {
+			errorEl.style.display = 'none'
+			loadingEl.style.display = 'none'
+
 			//считаем кол-во страниц и ваводим в пагинацию
 			const total = data.total
 			const pages = Math.ceil(total / 10)
@@ -91,20 +96,24 @@ const initApp = (page = 1) => {
 					<article class="app__card movie-card">
 						<a href="https://www.kinopoisk.ru/film/${item.filmId}" target="_blank" class="movie-card__link">
 							<div class="movie-card__image-wrapper">
-								<img src="${item.posterUrlPreview}" class="movie-card__image" alt="${item.nameRu}" loading="lazy">
+								<img src="${item.posterUrlPreview}" class="movie-card__image" alt="${!item.nameRu ? item.nameEn : item.nameRu}}" loading="lazy">
 								<div class="movie-card__hover">
-									<div class="movie-card__rating ${item.rating == null ? 'movie-card__rating--null' : ''}">${item.rating == null ? 'нет рейтинга' : item.rating}</div>
+									<div class="movie-card__rating ${item.rating == null ? 'movie-card__rating--null' : ''}">${item.rating == null ? 'нет рейтинга' : item.rating.toFixed(1)}</div>
 									<div class="movie-card__genres">${genresAll}</div>
 									<div class="movie-card__duration ${item.duration == 0 ? 'movie-card__duration--hidden' : ''}">${duration}</div>
 								</div>
 							</div>
-							<h2 class="movie-card__title">${item.nameRu}</h2>
+							<h2 class="movie-card__title">${!item.nameRu ? item.nameEn : item.nameRu}</h2>
 							<div class="movie-card__date">${date}</div>
 						</a>
 					</article>
 				</li>
 				`)
 			}
+		})
+		.catch(()=>{
+			errorEl.style.display = 'block'
+			loadingEl.style.display = 'none'
 		})
 }
 
